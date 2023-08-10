@@ -4,32 +4,20 @@ import useSWR from 'swr';
 import {useForm} from 'react-hook-form';
 import {Button} from './Button';
 import {Input} from './Input';
-import {useState} from 'react';
+import {searchTextStore} from '@/lib/store';
 
 interface SearchForm {
 	text: string;
 }
 
-async function fetcher(url: string) {
-	const data = await fetch(url).then((res) => res.json());
-	return data;
-}
-
-const SearchBar = ({setNewsList}: any) => {
-	const [query, setQuery] = useState<string>('');
+const SearchBar = () => {
+	const {setSearchText} = searchTextStore();
 	const {register, handleSubmit, reset} = useForm<SearchForm>();
-	const url = `/api/search?text=${query}`;
 
-	const {data, error, isValidating} = useSWR(url, fetcher);
 	const onValid = (data: SearchForm) => {
 		console.log(data);
-		setQuery(data.text);
+		setSearchText({text: data.text});
 	};
-
-	if (data && data.ok) {
-		// api 서버러도부터 data를 잘 가져올 경우 업데이트
-		setNewsList(data.result);
-	}
 
 	return (
 		<form className="flex" onSubmit={handleSubmit(onValid)}>
